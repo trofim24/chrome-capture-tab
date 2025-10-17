@@ -24,18 +24,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-async function startRecording(streamId) {
+async function startRecording(data) {
   try {
-    console.log('Requesting display media...');
+    console.log('Starting recording with data:', data);
     
-    // Use getDisplayMedia instead - this will show permission prompt
-    // Audio disabled by default
-    const stream = await navigator.mediaDevices.getDisplayMedia({
+    // Use getUserMedia with the streamId from tabCapture
+    // Use physical dimensions (accounting for DPR) for accurate capture
+    const constraints = {
       audio: false,
-      video: true
-    });
+      video: {
+        mandatory: {
+          chromeMediaSource: 'tab',
+          chromeMediaSourceId: data.streamId,
+          minWidth: data.dimensions.physicalWidth,
+          maxWidth: data.dimensions.physicalWidth,
+          minHeight: data.dimensions.physicalHeight,
+          maxHeight: data.dimensions.physicalHeight
+        }
+      }
+    };
     
-    console.log('Display media obtained:', stream);
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    
+    console.log('Tab capture stream obtained:', stream);
+    console.log('Logical dimensions:', data.dimensions.width, 'x', data.dimensions.height);
+    console.log('Physical dimensions (with DPR):', data.dimensions.physicalWidth, 'x', data.dimensions.physicalHeight);
+    console.log('Device Pixel Ratio:', data.dimensions.dpr);
     
     // VP9 with Opus codec
     const mimeType = 'video/webm;codecs=vp9,opus';
@@ -93,7 +107,11 @@ async function startRecording(streamId) {
     
   } catch (error) {
     console.error('Error starting recording:', error);
-    throw error;
+
+    chrome.runtime.sendMessage({
+      type: 'recording-stopped',
+      target: 'background'
+    });
   }
 }
 

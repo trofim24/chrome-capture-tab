@@ -33,6 +33,34 @@ async function startRecording(tabId) {
     recordingTabId = tabId;
     recordingUrl = null;
     
+    // Get tab dimensions
+    const tab = await chrome.tabs.get(tabId);
+    
+    // Execute script to get viewport dimensions with DPR
+    const [result] = await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      func: () => {
+        const dpr = window.devicePixelRatio || 1;
+        return {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          dpr: dpr,
+          physicalWidth: Math.round(window.innerWidth * dpr),
+          physicalHeight: Math.round(window.innerHeight * dpr)
+        };
+      }
+    });
+    
+    const dimensions = result.result;
+    console.log('Tab viewport dimensions:', dimensions);
+    
+    // Get stream ID using tabCapture
+    const streamId = await chrome.tabCapture.getMediaStreamId({
+      targetTabId: tabId
+    });
+    
+    console.log('Stream ID obtained:', streamId);
+    
     // Create offscreen document if it doesn't exist
     const existingContexts = await chrome.runtime.getContexts({
       contextTypes: ['OFFSCREEN_DOCUMENT']
@@ -51,11 +79,14 @@ async function startRecording(tabId) {
     
     console.log('Offscreen document ready');
     
-    // Send message to offscreen document to start recording
+    // Send message to offscreen document to start recording with dimensions
     await chrome.runtime.sendMessage({
       type: 'start-recording',
       target: 'offscreen',
-      data: null
+      data: {
+        streamId: streamId,
+        dimensions: dimensions
+      }
     });
     
     isRecording = true;
