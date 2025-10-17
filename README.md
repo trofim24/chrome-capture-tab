@@ -62,8 +62,6 @@ chrome-screen-recorder/
 ├── icon16.svg           # 16x16 icon
 ├── icon48.svg           # 48x48 icon
 ├── icon128.svg          # 128x128 icon
-├── create-icons.html    # Icon generator (optional)
-├── generate-icons.js    # Icon generator script (optional)
 └── README.md            # This file
 ```
 
