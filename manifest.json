@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chrome Tab Screen Recorder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Record Chrome tabs using MediaRecorder with VP9 codec",
   "permissions": [
     "tabCapture",
