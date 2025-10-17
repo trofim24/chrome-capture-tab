@@ -59,9 +59,9 @@ chrome-screen-recorder/
 ├── popup.html            # UI popup interface
 ├── popup.js              # Popup logic
 ├── background.js         # Background service worker
-├── icon16.svg           # 16x16 icon
-├── icon48.svg           # 48x48 icon
-├── icon128.svg          # 128x128 icon
+├── icon16.png           # 16x16 icon
+├── icon48.png           # 48x48 icon
+├── icon128.png          # 128x128 icon
 └── README.md            # This file
 ```
 
